@@ -124,12 +124,13 @@ class Program
         }
     }
 
-    // void RefreshPrices() {
+    // void RefreshPrices(Dictionary<Product, decimal> prices) {
     //     var request = new FetchPricesRequest();
     //     foreach (var price in prices) {
     //         request.Add(price.Key);
     //     }
     //     var response = FetchPrices(request);
+    //     ...
     // }
 
 
