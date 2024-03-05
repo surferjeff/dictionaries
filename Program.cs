@@ -34,10 +34,12 @@ class Program
 
     void FillDictionaries()
     {
+        Console.WriteLine("============ Dictionary ");
         var prices = new Dictionary<Product, decimal>();
         FillPrices(prices);
         prices = null;
         GC.Collect();
+        Console.WriteLine("============ SortedDictionary ");
         var prices2 = new SortedDictionary<Product, decimal>();
         FillPrices(prices2);
     }
@@ -71,6 +73,15 @@ class Program
         memory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory for {0} items: +{1}",
             prices.Count, memory - startingMemory);
+
+        // Refill it one more time and print the heap size.
+        for (int i = 0; i < 100000; i++)
+        {
+            prices.Add(new Product { ProductId = i, VendorName = RandomName() }, i);
+        }
+        memory = GC.GetTotalMemory(true) / 1024;
+        Console.WriteLine("memory for {0} items: +{1}", prices.Count,
+            memory - startingMemory);
 
         // Print the time it took to fill and clear the dictionary.
         Console.WriteLine("elapsed: {0}", elapsed);
