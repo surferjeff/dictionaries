@@ -49,20 +49,28 @@ class Program
 
     void FillPrices(IDictionary<Product, decimal> prices)
     {
+        // Print the initial heap size.
         var startingMemory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: {0}", startingMemory);
         var now = DateTime.Now;
+        
+        // Fill the prices dictionary with 100,000 products.
         for (int i = 0; i < 100000; i++)
         {
             prices.Add(new Product { ProductId = i, VendorName = RandomName() }, i);
         }
+
+        // Print the heap size after filling the dictionary.
         var memory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: +{0}", memory - startingMemory);
+
+        // Clear the dictionary and print the heap size.
         prices.Clear();
         var elapsed = DateTime.Now - now;
-        GC.Collect();
         memory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: +{0}", memory - startingMemory);
+
+        // Print the time it took to fill and clear the dictionary.
         Console.WriteLine("elapsed: {0}", elapsed);
     }
 
@@ -77,6 +85,40 @@ class Program
         prices.Add(new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m);
         prices.Add(new Product { ProductId = 1, VendorName = "Contoso" }, 100m);
     }
+
+    static void Gist1() {
+        var a = new Dictionary<Product, decimal> {
+            { new Product { ProductId = 1, VendorName = "Contoso" }, 100m },
+            { new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m }
+        };
+        var b = new Dictionary<Product, decimal> {
+            { new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m },
+            { new Product { ProductId = 1, VendorName = "Contoso" }, 100m }
+        };
+
+        Console.WriteLine(".Equals() {0}", a.Equals(b));
+        Console.WriteLine(".SequenceEquals() {0}", a.SequenceEqual(b));
+    }
+
+    static void WritePricesToCsv(IDictionary<Product, decimal> prices, string filename)
+    {
+        using (var writer = new StreamWriter(filename))
+        {
+            foreach (var price in prices)
+            {
+                writer.WriteLine("{0},{1},{2}", price.Key.ProductId, price.Key.VendorName, price.Value);
+            }
+        }
+    }
+
+    // void RefreshPrices() {
+    //     var request = new FetchPricesRequest();
+    //     foreach (var price in prices) {
+    //         request.Add(price.Key);
+    //     }
+    //     var response = FetchPrices(request);
+    // }
+
 
     static void ComparePrices(IDictionary<Product, decimal> a, IDictionary<Product, decimal> b)
     {
