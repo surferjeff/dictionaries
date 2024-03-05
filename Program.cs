@@ -51,7 +51,7 @@ class Program
     {
         // Print the initial heap size.
         var startingMemory = GC.GetTotalMemory(true) / 1024;
-        Console.WriteLine("memory: {0}", startingMemory);
+        Console.WriteLine("initial memory: {0}", startingMemory);
         var now = DateTime.Now;
         
         // Fill the prices dictionary with 100,000 products.
@@ -62,13 +62,15 @@ class Program
 
         // Print the heap size after filling the dictionary.
         var memory = GC.GetTotalMemory(true) / 1024;
-        Console.WriteLine("memory: +{0}", memory - startingMemory);
+        Console.WriteLine("memory for {0} items: +{1}", prices.Count,
+            memory - startingMemory);
 
         // Clear the dictionary and print the heap size.
         prices.Clear();
         var elapsed = DateTime.Now - now;
         memory = GC.GetTotalMemory(true) / 1024;
-        Console.WriteLine("memory: +{0}", memory - startingMemory);
+        Console.WriteLine("memory for {0} items: +{1}",
+            prices.Count, memory - startingMemory);
 
         // Print the time it took to fill and clear the dictionary.
         Console.WriteLine("elapsed: {0}", elapsed);
