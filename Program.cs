@@ -13,18 +13,22 @@ class Program
 {
     public Random random = new Random();
 
-    static void PrintPrices(Dictionary<Product, decimal> prices)
+    static void PrintPrices(IDictionary<Product, decimal> prices)
     {
         foreach (var price in prices)
         {
-            Console.WriteLine(price);
+            Console.Write(price.Key.ProductId);
         }
     }
 
     static void Main(string[] args)
     {
-        CompareDictionaries();
+        Console.WriteLine("============ Dictionary ============");
+        CompareDictionaries(() => new Dictionary<Product, decimal>());
+        Console.WriteLine("============ SortedDictionary ============");
+        CompareDictionaries(() => new SortedDictionary<Product, decimal>());
         var program = new Program();
+        Console.WriteLine("============ FillDictionaries ============");
         program.FillDictionaries();   
     }
 
@@ -62,23 +66,41 @@ class Program
         Console.WriteLine("elapsed: {0}", elapsed);
     }
 
-    static void CompareDictionaries()
+    static void Fill12(IDictionary<Product, decimal> prices)
     {
-        var prices = new Dictionary<Product, decimal> {
-            { new Product { ProductId = 1, VendorName = "Contoso" }, 100m },
-            { new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m }
-        };
+        prices.Add(new Product { ProductId = 1, VendorName = "Contoso" }, 100m);
+        prices.Add(new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m);
+    }
 
-        var prices2 = new Dictionary<Product, decimal> {
-            { new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m },
-            { new Product { ProductId = 1, VendorName = "Contoso" }, 100m }
-        };
+    static void Fill21(IDictionary<Product, decimal> prices)
+    {
+        prices.Add(new Product { ProductId = 2, VendorName = "Fabrikam" }, 150m);
+        prices.Add(new Product { ProductId = 1, VendorName = "Contoso" }, 100m);
+    }
 
-        PrintPrices(prices);
-        PrintPrices(prices2);
+    static void ComparePrices(IDictionary<Product, decimal> a, IDictionary<Product, decimal> b)
+    {
+        Console.Write("Comparing ");
+        PrintPrices(a);
+        Console.Write(" to ");
+        PrintPrices(b);
+        Console.WriteLine();
 
-        Console.WriteLine(prices.Equals(prices2)); // False
-        Console.WriteLine(prices.SequenceEqual(prices2)); // False
-        Console.WriteLine(prices.OrderBy(p => p.Key.ProductId).SequenceEqual(prices2.OrderBy(p => p.Key.ProductId))); // True
+        Console.WriteLine(".Equals() {0}", a.Equals(b));
+        Console.WriteLine(".SequenceEquals() {0}", a.SequenceEqual(b));
+        Console.WriteLine(".SequenceEquals(sorted) {0}",
+            a.OrderBy(p => p.Key.ProductId).SequenceEqual(b.OrderBy(p => p.Key.ProductId)));
+    }
+
+    static void CompareDictionaries(Func<IDictionary<Product, decimal> > newDictionary) {
+        var a = newDictionary();
+        Fill12(a);
+        var b = newDictionary();
+        Fill21(b);
+        var c = newDictionary();
+        Fill12(c);
+        ComparePrices(a, b);
+        ComparePrices(a, b);
+        ComparePrices(a, c);
     }
 }
