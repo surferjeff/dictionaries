@@ -1,23 +1,11 @@
 ﻿namespace dictionaries;
 
-struct Product : IComparable<Product>
+record struct Product(int ProductId, string VendorName) : IComparable<Product>
 {
-    public int ProductId;
-    public string VendorName;
-
-    public override string ToString() => $"ProductId: {ProductId}, VendorName: {VendorName}";
-
-    public int CompareTo(Product other)
-    {
-        if (ProductId < other.ProductId)
-        {
-            return -1;
-        }
-        if (ProductId > other.ProductId)
-        {
-            return 1;
-        }
-        return VendorName.CompareTo(other.VendorName);
+    public int CompareTo(Product other) {
+        var cmp = ProductId.CompareTo(other.ProductId);
+        if (cmp != 0) return cmp;
+        return string.Compare(VendorName, other.VendorName, StringComparison.Ordinal);
     }
 }
 
@@ -35,6 +23,7 @@ class Program
 
     static void Main(string[] args)
     {
+        CompareDictionaries();
         var program = new Program();
         program.FillDictionaries();   
     }
@@ -43,6 +32,8 @@ class Program
     {
         var prices = new Dictionary<Product, decimal>();
         FillPrices(prices);
+        prices = null;
+        GC.Collect();
         var prices2 = new SortedDictionary<Product, decimal>();
         FillPrices(prices2);
     }
@@ -54,18 +45,21 @@ class Program
 
     void FillPrices(IDictionary<Product, decimal> prices)
     {
-        var memory = GC.GetTotalMemory(true) / 1024;
-        Console.WriteLine("memory: {0}", memory);
+        var now = DateTime.Now;
+        var startingMemory = GC.GetTotalMemory(true) / 1024;
+        Console.WriteLine("memory: {0}", startingMemory);
         for (int i = 0; i < 100000; i++)
         {
-            prices.Add(new Product { ProductId = i, VendorName = RandomName() }, i);
+            prices.Add(new Product { ProductId = random.Next(1, 1001), VendorName = RandomName() }, i);
         }
-        memory = GC.GetTotalMemory(true) / 1024;
-        Console.WriteLine("memory: {0}", memory);
+        var memory = GC.GetTotalMemory(true) / 1024;
+        Console.WriteLine("memory: +{0}", memory - startingMemory);
         prices.Clear();
         GC.Collect();
         memory = GC.GetTotalMemory(true) / 1024;
-        Console.WriteLine("memory: {0}", memory);
+        Console.WriteLine("memory: +{0}", memory - startingMemory);
+        var elapsed = DateTime.Now - now;
+        Console.WriteLine("elapsed: {0}", elapsed);
     }
 
     static void CompareDictionaries()
