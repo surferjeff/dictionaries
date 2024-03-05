@@ -49,9 +49,9 @@ class Program
 
     void FillPrices(IDictionary<Product, decimal> prices)
     {
-        var now = DateTime.Now;
         var startingMemory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: {0}", startingMemory);
+        var now = DateTime.Now;
         for (int i = 0; i < 100000; i++)
         {
             prices.Add(new Product { ProductId = i, VendorName = RandomName() }, i);
@@ -59,10 +59,10 @@ class Program
         var memory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: +{0}", memory - startingMemory);
         prices.Clear();
+        var elapsed = DateTime.Now - now;
         GC.Collect();
         memory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: +{0}", memory - startingMemory);
-        var elapsed = DateTime.Now - now;
         Console.WriteLine("elapsed: {0}", elapsed);
     }
 
