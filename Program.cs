@@ -50,7 +50,7 @@ class Program
         Console.WriteLine("memory: {0}", startingMemory);
         for (int i = 0; i < 100000; i++)
         {
-            prices.Add(new Product { ProductId = random.Next(1, 1001), VendorName = RandomName() }, i);
+            prices.Add(new Product { ProductId = i, VendorName = RandomName() }, i);
         }
         var memory = GC.GetTotalMemory(true) / 1024;
         Console.WriteLine("memory: +{0}", memory - startingMemory);
